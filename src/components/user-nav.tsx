@@ -23,6 +23,13 @@ export function UserNav() {
         description: "You have been successfully signed out.",
     });
   };
+
+  const handleNewTeam = () => {
+    toast({
+        title: "New Team Created",
+        description: "A new team has been created successfully.",
+    });
+  };
   
   return (
     <DropdownMenu>
@@ -46,28 +53,26 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="#">
+            <Link href="/profile">
                 <User className="mr-2" />
                 <span>Profile</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="#">
+            <Link href="/billing">
                 <CreditCard className="mr-2" />
                 <span>Billing</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="#">
+            <Link href="/settings">
                 <Settings className="mr-2" />
                 <span>Settings</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="#">
-                <PlusCircle className="mr-2" />
-                <span>New Team</span>
-            </Link>
+          <DropdownMenuItem onClick={handleNewTeam}>
+            <PlusCircle className="mr-2" />
+            <span>New Team</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
