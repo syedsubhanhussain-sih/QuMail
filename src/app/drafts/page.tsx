@@ -2,8 +2,9 @@ import { UserNav } from '@/components/user-nav';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { QuMailLogoSimple } from '@/components/icons';
-import { Sidebar, SidebarContent, SidebarInset, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Inbox, Send, FileText, Star, Trash2, Edit } from 'lucide-react';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Edit } from 'lucide-react';
+import { AppSidebar } from '@/components/app-sidebar';
 
 export default function DraftsPage() {
   return (
@@ -29,52 +30,7 @@ export default function DraftsPage() {
         </div>
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar>
-          <SidebarContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/inbox">
-                    <Inbox />
-                    <span>Inbox</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/sent">
-                    <Send />
-                    <span>Sent</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/drafts">
-                    <FileText />
-                    <span>Drafts</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/starred">
-                    <Star />
-                    <span>Starred</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/spam">
-                    <Trash2 />
-                    <span>Spam</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarContent>
-        </Sidebar>
+        <AppSidebar />
         <SidebarInset>
           <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12">
             <div className="mx-auto max-w-4xl">
