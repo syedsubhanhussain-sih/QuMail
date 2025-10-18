@@ -1,12 +1,11 @@
 import { UserNav } from '@/components/user-nav';
 import { Button } from '@/components/ui/button';
-import { ComposeForm } from './_components/compose-form';
 import Link from 'next/link';
 import { QuMailLogoSimple } from '@/components/icons';
 import { Sidebar, SidebarContent, SidebarInset, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Inbox, Send, FileText, Star, Trash2, Edit } from 'lucide-react';
 
-export default function ComposePage() {
+export default function SpamPage() {
   return (
     <SidebarProvider>
     <div className="flex h-screen w-full flex-col bg-background font-display text-foreground">
@@ -77,14 +76,16 @@ export default function ComposePage() {
           </SidebarContent>
         </Sidebar>
         <SidebarInset>
-            <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12">
-              <div className="mx-auto max-w-4xl">
-                <h2 className="font-headline mb-6 text-3xl font-bold text-foreground">
-                  New Message
-                </h2>
-                <ComposeForm />
+          <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12">
+            <div className="mx-auto max-w-4xl">
+              <h2 className="font-headline mb-6 text-3xl font-bold text-foreground">
+                Spam
+              </h2>
+              <div className="flex items-center justify-center rounded-lg border border-dashed p-12 text-center">
+                <p>Hooray, no spam!</p>
               </div>
-            </main>
+            </div>
+          </main>
         </SidebarInset>
       </div>
     </div>

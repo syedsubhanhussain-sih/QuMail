@@ -1,3 +1,4 @@
+'use client';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,10 +10,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useToast } from "@/hooks/use-toast"
 import { CreditCard, LogOut, PlusCircle, Settings, User } from "lucide-react"
 import Link from "next/link"
 
 export function UserNav() {
+  const { toast } = useToast();
+
+  const handleSignOut = () => {
+    toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out.",
+    });
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -60,7 +71,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2" />
           <span>Log out</span>
         </DropdownMenuItem>
