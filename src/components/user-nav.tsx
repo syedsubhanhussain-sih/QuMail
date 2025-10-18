@@ -13,9 +13,11 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { CreditCard, LogOut, PlusCircle, Settings, User } from "lucide-react"
 import Link from "next/link"
+import placeholderImages from '@/lib/placeholder-images.json';
 
 export function UserNav() {
   const { toast } = useToast();
+  const userAvatar = placeholderImages.placeholderImages.find(img => img.id === 'user-avatar-1');
 
   const handleSignOut = () => {
     toast({
@@ -36,7 +38,11 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarImage src="https://picsum.photos/seed/1/100/100" alt="User Avatar" data-ai-hint="person portrait" />
+            {userAvatar ? (
+              <AvatarImage src={userAvatar.imageUrl} alt={userAvatar.description} data-ai-hint={userAvatar.imageHint} />
+            ) : (
+              <AvatarImage src="https://picsum.photos/seed/1/100/100" alt="User Avatar" data-ai-hint="person portrait" />
+            )}
             <AvatarFallback>AV</AvatarFallback>
           </Avatar>
         </Button>
