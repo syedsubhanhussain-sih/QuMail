@@ -39,8 +39,8 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
-import { fetchSecurityGuidance } from '@/app/actions';
+import React, { useCallback, useEffect, useState, useTransition } from 'react';
+import { fetchSecurityGuidance, sendEmailAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
@@ -64,6 +64,7 @@ export function ComposeForm() {
   const [isGuidanceLoading, setIsGuidanceLoading] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -103,15 +104,27 @@ export function ComposeForm() {
   }
 
   function handleSend() {
-    console.log('Sending email with values:', form.getValues());
     setShowConfirmDialog(false);
-    toast({
-      title: 'Email Sent!',
-      description: 'Your message has been sent successfully.',
+    startTransition(async () => {
+        const values = form.getValues();
+        const result = await sendEmailAction(values);
+
+        if (result.success) {
+            toast({
+                title: 'Email Sent!',
+                description: 'Your message has been sent successfully.',
+            });
+            form.reset();
+            setAttachments([]);
+            setGuidance('');
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to Send Email',
+                description: result.message,
+            });
+        }
     });
-    form.reset();
-    setAttachments([]);
-    setGuidance('');
   }
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -281,7 +294,8 @@ export function ComposeForm() {
               </Button>
               <input type="file" multiple onChange={handleFileChange} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
             </div>
-            <Button type="submit" className="gap-2">
+            <Button type="submit" className="gap-2" disabled={isPending}>
+              {isPending && <Loader2 className="animate-spin" />}
               <span>Send</span>
               <Send className="h-4 w-4" />
             </Button>
@@ -302,7 +316,8 @@ export function ComposeForm() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSend} className="gap-2">
+            <AlertDialogAction onClick={handleSend} className="gap-2" disabled={isPending}>
+               {isPending && <Loader2 className="animate-spin" />}
               <span>Send</span>
               <Send className="h-4 w-4" />
             </AlertDialogAction>
