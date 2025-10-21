@@ -1,13 +1,30 @@
+'use client';
+
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { AppHeader } from '@/components/app-header';
+import { useTheme } from 'next-themes';
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full flex-col bg-background font-display text-foreground">
@@ -21,7 +38,9 @@ export default function SettingsPage() {
                   <h2 className="font-headline mb-2 text-3xl font-bold text-foreground">
                     Settings
                   </h2>
-                  <p className="text-muted-foreground">Manage your application and notification settings.</p>
+                  <p className="text-muted-foreground">
+                    Manage your application and notification settings.
+                  </p>
                 </div>
 
                 <Card>
@@ -33,13 +52,19 @@ export default function SettingsPage() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="theme" className="flex flex-col space-y-1">
+                      <Label
+                        htmlFor="theme"
+                        className="flex flex-col space-y-1"
+                      >
                         <span>Theme</span>
                         <span className="font-normal leading-snug text-muted-foreground">
                           Select the theme for the application.
                         </span>
                       </Label>
-                      <Select defaultValue="dark">
+                      <Select
+                        value={theme}
+                        onValueChange={setTheme}
+                      >
                         <SelectTrigger id="theme" className="w-[180px]">
                           <SelectValue placeholder="Select theme" />
                         </SelectTrigger>
@@ -62,7 +87,10 @@ export default function SettingsPage() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="email-notifications" className="flex flex-col space-y-1">
+                      <Label
+                        htmlFor="email-notifications"
+                        className="flex flex-col space-y-1"
+                      >
                         <span>Email Notifications</span>
                         <span className="font-normal leading-snug text-muted-foreground">
                           Receive notifications for new emails.
@@ -72,7 +100,10 @@ export default function SettingsPage() {
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="desktop-notifications" className="flex flex-col space-y-1">
+                      <Label
+                        htmlFor="desktop-notifications"
+                        className="flex flex-col space-y-1"
+                      >
                         <span>Desktop Notifications</span>
                         <span className="font-normal leading-snug text-muted-foreground">
                           Show notifications on your desktop.
