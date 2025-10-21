@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { QuMailLogoSimple } from '@/components/icons';
 import { UserNav } from '@/components/user-nav';
 import { Edit } from 'lucide-react';
 
@@ -11,12 +10,6 @@ export function AppHeader() {
       <div className="flex items-center gap-4">
         {/* Sidebar trigger for mobile, hidden on medium screens and up */}
         <SidebarTrigger className="md:hidden" />
-        
-        {/* Logo and Title, hidden on extra-small screens, flex on small screens and up */}
-        <Link href="/inbox" className="hidden sm:flex items-center gap-2">
-          <QuMailLogoSimple className="h-8 w-8 text-primary" />
-          <h1 className="text-lg font-bold text-foreground">QuMail</h1>
-        </Link>
       </div>
 
       <div className="flex items-center gap-4">
