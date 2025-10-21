@@ -43,12 +43,16 @@ const sendEmailFlow = ai.defineFlow(
     }
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     
-    // Construct the secure link for production (Vercel) or local development
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+    // Determine the base URL based on the environment
+    let baseUrl;
+    if (process.env.VERCEL_ENV === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+      baseUrl = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    } else if (process.env.VERCEL_URL) {
+      baseUrl = `https://${process.env.VERCEL_URL}`;
+    } else {
+      // Fallback for local development
+      baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    }
 
     const readUrl = new URL('/read', baseUrl);
     readUrl.searchParams.append('body', encodeURIComponent(input.body));
@@ -71,7 +75,7 @@ const sendEmailFlow = ai.defineFlow(
 
     const msg = {
       to: input.to,
-      // IMPORTANT: You must verify a sender email address in your SendGrid account.
+      // IMPORTANT: You must verify a sender email in your SendGrid account.
       from: 'syedsubhanhussain.sih@gmail.com', 
       subject: `[Secure Message] ${input.subject}`,
       text: `You have received a secure message. To view it, open the following link in your browser: ${readUrl.toString()}`,
