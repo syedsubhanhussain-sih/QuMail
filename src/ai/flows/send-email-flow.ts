@@ -46,7 +46,8 @@ const sendEmailFlow = ai.defineFlow(
       // IMPORTANT: You must verify a sender email address in your SendGrid account.
       from: 'syedsubhanhussain.sih@gmail.com', 
       subject: input.subject,
-      html: input.body,
+      text: input.body,
+      html: `<p>${input.body.replace(/\n/g, '<br>')}</p>`,
     };
 
     try {

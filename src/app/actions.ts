@@ -6,6 +6,11 @@ import {
   type SecurityLevelGuidanceInput,
 } from '@/ai/flows/security-selection-guidance';
 import { sendEmail, type SendEmailInput } from '@/ai/flows/send-email-flow';
+import {
+  generateSecurityKey,
+  type GenerateSecurityKeyInput,
+  type GenerateSecurityKeyOutput,
+} from '@/ai/flows/generate-security-key-flow';
 
 export async function fetchSecurityGuidance(
   input: SecurityLevelGuidanceInput
@@ -23,4 +28,10 @@ export async function sendEmailAction(
   input: SendEmailInput
 ): Promise<{ success: boolean; message: string }> {
     return await sendEmail(input);
+}
+
+export async function generateKeyAction(
+    input: GenerateSecurityKeyInput
+): Promise<GenerateSecurityKeyOutput> {
+    return await generateSecurityKey(input);
 }

@@ -39,7 +39,7 @@ import {
   X,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState, useTransition } from 'react';
-import { fetchSecurityGuidance, sendEmailAction } from '@/app/actions';
+import { fetchSecurityGuidance, sendEmailAction, generateKeyAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
@@ -108,10 +108,20 @@ export function ComposeForm() {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
+
+      const keyResult = await generateKeyAction({
+          securityLevel: values.securityLevel,
+      });
+
+      toast({
+          title: `Security Applied: ${values.securityLevel}`,
+          description: `${keyResult.description} Key: ${keyResult.key}`,
+      });
+
       const result = await sendEmailAction({
         to: values.to,
         subject: values.subject,
-        body: values.body,
+        body: `--- MESSAGE SENT WITH ${values.securityLevel} ---\n\n${values.body}`,
       });
 
       if (result.success) {
