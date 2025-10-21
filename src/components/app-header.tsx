@@ -10,8 +10,8 @@ export function AppHeader() {
       <div className="flex items-center gap-4">
         <SidebarTrigger className="md:hidden" />
         <div className="hidden items-center gap-2 md:flex">
-          <Mail className="h-6 w-6" />
-          <h1 className="text-xl font-semibold">Quantum Mail</h1>
+          <Mail className="h-6 w-6 text-primary" />
+          <h1 className="text-xl font-semibold text-primary">Quantum Mail</h1>
         </div>
       </div>
 
