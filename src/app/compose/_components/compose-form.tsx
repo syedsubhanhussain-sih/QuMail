@@ -32,7 +32,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-  AttachFile,
   Loader2,
   Paperclip,
   Send,
@@ -84,84 +83,97 @@ export function ComposeForm() {
   const getGuidance = useCallback(async () => {
     if (recipient && messageContent) {
       setIsGuidanceLoading(true);
-      const result = await fetchSecurityGuidance({ recipient, messageContent });
-      setGuidance(result);
-      setIsGuidanceLoading(false);
+      try {
+        const result = await fetchSecurityGuidance({
+          recipient,
+          messageContent,
+        });
+        setGuidance(result);
+      } catch (error) {
+        setGuidance('Could not retrieve guidance.');
+      } finally {
+        setIsGuidanceLoading(false);
+      }
     }
   }, [recipient, messageContent]);
 
   useEffect(() => {
-    const debounce = setTimeout(() => {
-      getGuidance();
-    }, 1000);
-
-    return () => clearTimeout(debounce);
+    if (recipient && messageContent) {
+      const handler = setTimeout(() => {
+        getGuidance();
+      }, 1000);
+      return () => clearTimeout(handler);
+    }
   }, [recipient, messageContent, getGuidance]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setSecurityLevelToConfirm(values.securityLevel);
-    setShowConfirmDialog(true);
-  }
-
-  function handleSend() {
-    setShowConfirmDialog(false);
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
-        const values = form.getValues();
-        const result = await sendEmailAction(values);
+      const result = await sendEmailAction({
+        to: values.to,
+        subject: values.subject,
+        body: values.body,
+      });
 
-        if (result.success) {
-            toast({
-                title: 'Email Sent!',
-                description: 'Your message has been sent successfully.',
-            });
-            form.reset();
-            setAttachments([]);
-            setGuidance('');
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Failed to Send Email',
-                description: result.message,
-            });
-        }
+      if (result.success) {
+        toast({
+          title: 'Email Sent',
+          description: 'Your secure email has been sent successfully.',
+        });
+        form.reset();
+        setAttachments([]);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Failed to send email',
+          description: result.message,
+        });
+      }
     });
-  }
+  };
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+  const handleSend = () => {
+    const securityLevel = form.getValues('securityLevel');
+    if (securityLevel === 'Quantum Secure - OTP') {
+      setSecurityLevelToConfirm(securityLevel);
+      setShowConfirmDialog(true);
+    } else {
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
+  const handleConfirmSend = () => {
+    setShowConfirmDialog(false);
+    form.handleSubmit(onSubmit)();
+  };
+
+  const handleFileAttach = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      const newFiles = Array.from(event.target.files).map(file => ({
+      const files = Array.from(event.target.files);
+      const newAttachments = files.map(file => ({
         name: file.name,
         size: file.size,
       }));
-      setAttachments(prev => [...prev, ...newFiles]);
+      setAttachments(prev => [...prev, ...newAttachments]);
     }
-  }
+  };
 
-  function removeAttachment(index: number) {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
-  }
-
-  const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  const handleRemoveAttachment = (name: string) => {
+    setAttachments(prev => prev.filter(att => att.name !== name));
   };
 
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="to"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>To</FormLabel>
                   <FormControl>
-                    <Input placeholder="To" {...field} />
+                    <Input placeholder="recipient@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -169,50 +181,28 @@ export function ComposeForm() {
             />
             <FormField
               control={form.control}
-              name="cc"
+              name="subject"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Subject</FormLabel>
                   <FormControl>
-                    <Input placeholder="Cc" {...field} />
+                    <Input placeholder="Email subject" {...field} />
                   </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="bcc"
-              render={({ field }) => (
-                <FormItem className="sm:col-span-2">
-                  <FormControl>
-                    <Input placeholder="Bcc" {...field} />
-                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-
-          <FormField
-            control={form.control}
-            name="subject"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Subject" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <FormField
             control={form.control}
             name="body"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Message</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Write your message here..."
-                    rows={12}
+                    placeholder="Compose your secure message..."
+                    className="min-h-[250px]"
                     {...field}
                   />
                 </FormControl>
@@ -221,105 +211,103 @@ export function ComposeForm() {
             )}
           />
 
-          {attachments.length > 0 && (
-            <div className="space-y-3 rounded-lg border p-4">
-              <h3 className="text-base font-medium">Attachments</h3>
-              {attachments.map((file, index) => (
-                <div key={index} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-                  <div className="flex items-center gap-3">
-                    <Paperclip className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-sm">
-                      <p className="font-medium">{file.name}</p>
-                      <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => removeAttachment(index)}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-
-
-          <div>
+          <div className="space-y-4 rounded-lg border bg-secondary/50 p-4">
             <FormField
               control={form.control}
               name="securityLevel"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Security Level</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a security level" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Quantum Secure - OTP">
-                        Quantum Secure - OTP
-                      </SelectItem>
-                      <SelectItem value="Quantum-aided AES">
-                        Quantum-aided AES
-                      </SelectItem>
-                      <SelectItem value="PQC">PQC</SelectItem>
-                      <SelectItem value="No Quantum security">
-                        No Quantum security
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-4">
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a security level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Quantum Secure - OTP">
+                          Quantum Secure - OTP
+                        </SelectItem>
+                        <SelectItem value="Quantum-aided AES">
+                          Quantum-aided AES
+                        </SelectItem>
+                        <SelectItem value="PQC">PQC</SelectItem>
+                        <SelectItem value="No Quantum security">
+                          No Quantum security
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <FormMessage />
                 </FormItem>
               )}
             />
-            {(isGuidanceLoading || guidance) && (
-              <div className="mt-2 flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm text-primary/80">
-                {isGuidanceLoading ? (
-                  <Loader2 className="mt-1 h-4 w-4 animate-spin shrink-0" />
-                ) : (
-                  <Sparkles className="mt-1 h-4 w-4 shrink-0" />
-                )}
-                <p>{isGuidanceLoading ? 'Analyzing message for security recommendation...' : guidance}</p>
+            {isGuidanceLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Getting guidance...</span>
               </div>
+            ) : guidance ? (
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-accent" />
+                {guidance}
+              </p>
+            ) : null}
+          </div>
+          
+          <div className="space-y-2">
+            <FormLabel>Attachments</FormLabel>
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="outline" size="sm" asChild>
+                <label htmlFor="file-upload">
+                  <Paperclip className="mr-2 h-4 w-4" />
+                  Attach Files
+                </label>
+              </Button>
+              <input id="file-upload" type="file" multiple className="hidden" onChange={handleFileAttach} />
+            </div>
+            {attachments.length > 0 && (
+                <div className="mt-2 space-y-2">
+                    {attachments.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between rounded-md border p-2 text-sm">
+                            <span>{file.name} ({(file.size / 1024).toFixed(2)} KB)</span>
+                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveAttachment(file.name)}>
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                </div>
             )}
           </div>
 
-          <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative">
-              <Button type="button" variant="outline" className="gap-2">
-                <Paperclip className="h-4 w-4" />
-                <span>Attach File</span>
-              </Button>
-              <input type="file" multiple onChange={handleFileChange} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
-            </div>
-            <Button type="submit" className="gap-2" disabled={isPending}>
-              {isPending && <Loader2 className="animate-spin" />}
-              <span>Send</span>
-              <Send className="h-4 w-4" />
+          <div className="flex justify-end">
+            <Button type="button" size="lg" onClick={handleSend} disabled={isPending}>
+              {isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
+              Send
             </Button>
           </div>
         </form>
       </Form>
+
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Send</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Security Level</AlertDialogTitle>
             <AlertDialogDescription>
-              You are about to send this email with{' '}
-              <span className="font-bold text-primary">
-                {securityLevelToConfirm}
-              </span>{' '}
-              level security. Do you want to proceed?
+              You have selected Quantum Secure - OTP. This provides the highest
+              level of security but may be slower. Are you sure you want to
+              proceed?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSend} className="gap-2" disabled={isPending}>
-               {isPending && <Loader2 className="animate-spin" />}
-              <span>Send</span>
-              <Send className="h-4 w-4" />
+            <AlertDialogAction onClick={handleConfirmSend}>
+              Continue
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

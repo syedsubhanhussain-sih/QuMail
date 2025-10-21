@@ -37,7 +37,7 @@ const sendEmailFlow = ai.defineFlow(
     // SENDGRID_API_KEY='YOUR_SENDGRID_API_KEY'
     if (!process.env.SENDGRID_API_KEY) {
       console.error('SENDGRID_API_KEY is not set.');
-      return { success: false, message: 'Email service is not configured.' };
+      return { success: false, message: 'Email service is not configured. Missing API Key.' };
     }
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -54,7 +54,8 @@ const sendEmailFlow = ai.defineFlow(
       return { success: true, message: 'Email sent successfully.' };
     } catch (error: any) {
       console.error('SendGrid Error:', error.response?.body || error.message);
-      return { success: false, message: 'Failed to send email.' };
+      const errorMessage = error.response?.body?.errors?.[0]?.message || 'Failed to send email.';
+      return { success: false, message: errorMessage };
     }
   }
 );
