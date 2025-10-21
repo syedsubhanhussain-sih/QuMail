@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { QuMailLogoSimple } from '@/components/icons';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Edit, Download } from 'lucide-react';
+import { Edit, Download, CreditCard } from 'lucide-react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -22,10 +22,12 @@ export default function BillingPage() {
       <header className="flex shrink-0 items-center justify-between border-b px-6 py-3">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="md:hidden" />
-          <Link href="/inbox" className="flex items-center gap-4">
-            <QuMailLogoSimple className="h-8 w-8 text-primary" />
-            <h1 className="text-lg font-bold text-foreground">QuMail</h1>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/inbox" className="flex items-center gap-4">
+              <QuMailLogoSimple className="h-8 w-8 text-primary" />
+              <h1 className="text-lg font-bold text-foreground">QuMail</h1>
+            </Link>
+          </div>
         </div>
         
         <div className="flex items-center gap-4">
@@ -76,7 +78,7 @@ export default function BillingPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4 rounded-lg border bg-secondary p-4">
-                    <CreditCardIcon className="h-8 w-8" />
+                    <CreditCard className="h-8 w-8" />
                     <div>
                       <p className="font-semibold">Visa ending in 1234</p>
                       <p className="text-sm text-muted-foreground">Expires 12/2028</p>
@@ -132,25 +134,5 @@ export default function BillingPage() {
       </div>
     </div>
     </SidebarProvider>
-  );
-}
-
-function CreditCardIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="20" height="14" x="2" y="5" rx="2" />
-      <line x1="2" x2="22" y1="10" y2="10" />
-    </svg>
   );
 }

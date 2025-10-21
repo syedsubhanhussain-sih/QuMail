@@ -13,10 +13,12 @@ export default function StarredPage() {
       <header className="flex shrink-0 items-center justify-between border-b px-6 py-3">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="md:hidden" />
+          <div className="flex items-center gap-4">
           <Link href="/inbox" className="flex items-center gap-4">
             <QuMailLogoSimple className="h-8 w-8 text-primary" />
             <h1 className="text-lg font-bold text-foreground">QuMail</h1>
           </Link>
+          </div>
         </div>
         
         <div className="flex items-center gap-4">
