@@ -43,10 +43,13 @@ const sendEmailFlow = ai.defineFlow(
     }
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     
-    // Construct the secure link
-    // For local development on a mobile device, set NEXT_PUBLIC_BASE_URL in your .env file
-    // e.g., NEXT_PUBLIC_BASE_URL=http://192.168.1.10:3000
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // Construct the secure link for production (Vercel) or local development
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+      ? process.env.NEXT_PUBLIC_BASE_URL
+      : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+
     const readUrl = new URL('/read', baseUrl);
     readUrl.searchParams.append('body', encodeURIComponent(input.body));
     readUrl.searchParams.append('key', encodeURIComponent(input.securityKey));
