@@ -14,7 +14,9 @@ import sgMail from '@sendgrid/mail';
 const SendEmailInputSchema = z.object({
   to: z.string().email().describe('The email address of the recipient.'),
   subject: z.string().describe('The subject of the email.'),
-  body: z.string().describe('The HTML body of the email.'),
+  body: z.string().describe('The plain text body of the email.'),
+  securityLevel: z.string().describe('The security level applied.'),
+  securityKey: z.string().describe('The generated security key.'),
 });
 export type SendEmailInput = z.infer<typeof SendEmailInputSchema>;
 
@@ -40,14 +42,35 @@ const sendEmailFlow = ai.defineFlow(
       return { success: false, message: 'Email service is not configured. Missing API Key.' };
     }
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    
+    // Construct the secure link
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const readUrl = new URL('/read', baseUrl);
+    readUrl.searchParams.append('body', encodeURIComponent(input.body));
+    readUrl.searchParams.append('key', encodeURIComponent(input.securityKey));
+    readUrl.searchParams.append('securityLevel', encodeURIComponent(input.securityLevel));
+
+    const emailBody = `
+      You have received a secure message.
+      <br><br>
+      This message was sent using <strong>${input.securityLevel}</strong>.
+      <br><br>
+      To decrypt and view your message, please click the link below:
+      <br><br>
+      <a href="${readUrl.toString()}" style="background-color: #095de7; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Secure Message</a>
+      <br><br>
+      If you cannot click the link, copy and paste this URL into your browser:
+      <br>
+      ${readUrl.toString()}
+    `;
 
     const msg = {
       to: input.to,
       // IMPORTANT: You must verify a sender email address in your SendGrid account.
       from: 'syedsubhanhussain.sih@gmail.com', 
-      subject: input.subject,
-      text: input.body,
-      html: `<p>${input.body.replace(/\n/g, '<br>')}</p>`,
+      subject: `[Secure Message] ${input.subject}`,
+      text: `You have received a secure message. To view it, open the following link in your browser: ${readUrl.toString()}`,
+      html: `<p>${emailBody.replace(/\n/g, '<br>')}</p>`,
     };
 
     try {

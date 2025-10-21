@@ -41,6 +41,7 @@ import {
 import React, { useCallback, useEffect, useState, useTransition } from 'react';
 import { fetchSecurityGuidance, sendEmailAction, generateKeyAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+import { type GenerateSecurityKeyOutput } from '@/ai/flows/generate-security-key-flow';
 
 const formSchema = z.object({
   to: z.string().email({ message: 'Invalid email address.' }),
@@ -109,25 +110,27 @@ export function ComposeForm() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
 
-      const keyResult = await generateKeyAction({
+      const keyResult: GenerateSecurityKeyOutput = await generateKeyAction({
           securityLevel: values.securityLevel,
       });
 
       toast({
           title: `Security Applied: ${values.securityLevel}`,
-          description: `${keyResult.description} Key: ${keyResult.key}`,
+          description: `${keyResult.description}`,
       });
 
       const result = await sendEmailAction({
         to: values.to,
         subject: values.subject,
-        body: `--- MESSAGE SENT WITH ${values.securityLevel} ---\n\n${values.body}`,
+        body: values.body,
+        securityLevel: values.securityLevel,
+        securityKey: keyResult.key,
       });
 
       if (result.success) {
         toast({
-          title: 'Email Sent',
-          description: 'Your secure email has been sent successfully.',
+          title: 'Secure Email Link Sent',
+          description: 'A link to the secure message has been sent.',
         });
         form.reset();
         setAttachments([]);
