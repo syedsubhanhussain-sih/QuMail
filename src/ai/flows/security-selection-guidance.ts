@@ -32,21 +32,17 @@ const prompt = ai.definePrompt({
   name: 'securityLevelGuidancePrompt',
   input: {schema: SecurityLevelGuidanceInputSchema},
   output: {schema: SecurityLevelGuidanceOutputSchema},
-  prompt: `You are an AI assistant that provides guidance on selecting the most appropriate security level for an email.
-
-  Based on the message content and recipient, recommend one of the following security levels:
-  - Quantum Secure - OTP: For highly sensitive information requiring maximum security.
-  - Quantum-aided AES: For sensitive information that needs strong security against current and future threats.
-  - PQC: For information that needs long-term security and resistance to quantum computing attacks.
-  - No Quantum security: For non-sensitive, everyday communication.
+  prompt: `You are an AI assistant providing security level guidance for an email.
+  Based on the content and recipient, recommend a security level:
+  - Quantum Secure - OTP: Max security for highly sensitive data.
+  - Quantum-aided AES: Strong security for sensitive data.
+  - PQC: Long-term security against quantum attacks.
+  - No Quantum security: For non-sensitive communication.
 
   Message Content: {{{messageContent}}}
   Recipient: {{{recipient}}}
 
-  Provide a brief explanation of why the recommended security level is appropriate for this specific message and recipient.
-  Ensure that the output is a single sentence.
-  Be concise and direct.
-  The output should be geared toward a general audience with limited knowledge of Quantum security concepts.
+  Provide a single, concise sentence explaining the best choice for a general user.
 `,
 });
 
