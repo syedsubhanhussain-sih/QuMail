@@ -8,7 +8,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import sgMail from '@sendgrid/mail';
 
 const SendEmailInputSchema = z.object({
@@ -44,7 +44,7 @@ const sendEmailFlow = ai.defineFlow(
     const msg = {
       to: input.to,
       // IMPORTANT: You must verify a sender email address in your SendGrid account.
-      from: 'your-verified-email@example.com', 
+      from: 'syedsubhanhussain.sih@gmail.com', 
       subject: input.subject,
       html: input.body,
     };
