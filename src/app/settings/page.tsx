@@ -21,9 +21,19 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { AppHeader } from '@/components/app-header';
 import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export default function SettingsPage() {
+  const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <SidebarProvider>
